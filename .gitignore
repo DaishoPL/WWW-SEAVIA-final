@@ -1,0 +1,20 @@
+# 1. Pliki systemowe (Twój system to macOS, więc to absolutna podstawa)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Systemowe Windows (na wypadek, gdyby projekt otwierał ktoś na PC)
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 2. Pliki konfiguracyjne edytorów kodu (np. VS Code)
+.vscode/
+.idea/
+*.suo
+*.sln
+
+# 3. Logi błędów PHP
+# (Opcjonalnie, gdyby contact.php generował lokalnie pliki z błędami)
+error_log
+php_errors.log
