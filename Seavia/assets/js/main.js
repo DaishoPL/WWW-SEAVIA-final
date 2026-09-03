@@ -455,8 +455,6 @@
       const about = (formData.get('about') || '').toString().trim();
       const cvFile = formData.get('cvFile');
       const notRobot = formData.get('notRobot');
-      const turnstileResponse = document.querySelector('input[name="cf-turnstile-response"]');
-
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       if (!firstName || !lastName || !phone || !email || !about) {
@@ -477,19 +475,46 @@
         return;
       }
 
-      if (!turnstileResponse || !turnstileResponse.value) {
-        if (successMessage) successMessage.textContent = 'Please complete the security check.';
-        successMessage.style.color = '#b42318';
-        return;
-      }
-
       if (!notRobot) {
         if (successMessage) successMessage.textContent = 'Please confirm that the information is correct.';
         successMessage.style.color = '#b42318';
         return;
       }
 
-      recruitmentForm.submit();
+      const turnstileResponse = formData.get('cf-turnstile-response');
+      if (!turnstileResponse) {
+        if (successMessage) successMessage.textContent = 'Please complete the security check.';
+        successMessage.style.color = '#b42318';
+        return;
+      }
+
+      const submitButton = recruitmentForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+
+      fetch(recruitmentForm.action, {
+        method: 'POST',
+        body: formData
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (successMessage) {
+            successMessage.textContent = result.message || 'The application could not be sent.';
+            successMessage.style.color = result.success ? '#0f8a5f' : '#b42318';
+          }
+          if (result.success) {
+            recruitmentForm.reset();
+            if (window.turnstile) window.turnstile.reset();
+          }
+        })
+        .catch(() => {
+          if (successMessage) {
+            successMessage.textContent = 'The application could not be sent. Please try again later.';
+            successMessage.style.color = '#b42318';
+          }
+        })
+        .finally(() => {
+          if (submitButton) submitButton.disabled = false;
+        });
     });
   }
 })()
