@@ -244,6 +244,13 @@ h6 {
   position: relative;
 }
 
+.navbar a[href="#team"] {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: normal;
+}
+
 .navbar a i,
 .navbar a:focus i {
   font-size: 12px;
@@ -2631,11 +2638,11 @@ section {
   text-transform: uppercase;
 }
 
-.contact-team .team-directory {
+.team-section .team-directory {
   margin-top: 0;
 }
 
-.contact-team .team-grid {
+.team-section .team-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 

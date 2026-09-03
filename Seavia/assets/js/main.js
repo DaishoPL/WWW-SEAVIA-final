@@ -315,6 +315,14 @@
     contactAction.addEventListener('blur', () => contactAction.classList.remove('is-engaged'));
   });
 
+  const teamDirectory = select('.contact-team .team-directory');
+  const teamContent = select('#team-content');
+  if (teamDirectory && teamContent) {
+    const oldTeamWrapper = teamDirectory.closest('.contact-team');
+    teamContent.appendChild(teamDirectory);
+    oldTeamWrapper.remove();
+  }
+
   const panels = select('.site-panel', true);
   const closePanels = () => {
     panels.forEach((panel) => {
