@@ -324,6 +324,14 @@
     select('.team-card', true).forEach((card, index) => {
       card.setAttribute('data-aos', 'zoom-in-up');
       card.setAttribute('data-aos-delay', String(100 + index * 70));
+
+      const emailLink = card.querySelector('.team-contact-links a[href^="mailto:"]');
+      const links = card.querySelector('.team-contact-links');
+      if (emailLink && links) {
+        emailLink.textContent = emailLink.href.replace(/^mailto:/i, '');
+        emailLink.removeAttribute('aria-label');
+        links.replaceChildren(emailLink);
+      }
     });
   }
 
