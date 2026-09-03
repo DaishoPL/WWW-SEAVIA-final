@@ -2485,6 +2485,58 @@ section {
   margin: 0;
 }
 
+.portfolio-flex-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.portfolio-flex-row {
+  display: flex;
+  gap: 18px;
+}
+
+.portfolio-flex-pair,
+.portfolio-flex-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.portfolio-flex-pair {
+  flex: 2 1 48%;
+}
+
+.portfolio-flex-cluster {
+  flex: 1 1 30%;
+}
+
+.portfolio-flex-item {
+  position: relative;
+  min-width: 0;
+  margin: 0 !important;
+  overflow: hidden;
+}
+
+.portfolio-flex-feature {
+  flex: 1 1 calc(50% - 9px);
+  aspect-ratio: 3 / 4;
+}
+
+.portfolio-flex-small {
+  flex: 1 1 calc(50% - 9px);
+  aspect-ratio: 1;
+}
+
+.portfolio-flex-row-details {
+  flex-wrap: wrap;
+}
+
+.portfolio-flex-detail {
+  flex: 1 1 calc(20% - 15px);
+  aspect-ratio: 1;
+}
+
 .portfolio .portfolio-item .portfolio-info h4,
 .portfolio .portfolio-item .portfolio-info p,
 .portfolio .portfolio-item .portfolio-info .details-link {
@@ -2523,6 +2575,25 @@ section {
   position: relative;
   z-index: 1;
   cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .portfolio-flex-row-featured {
+    flex-direction: column;
+  }
+
+  .portfolio-flex-pair,
+  .portfolio-flex-cluster {
+    flex: 1 1 auto;
+  }
+
+  .portfolio-flex-feature {
+    aspect-ratio: 4 / 3;
+  }
+
+  .portfolio-flex-detail {
+    flex-basis: calc(50% - 9px);
+  }
 }
 
 .services .icon-box {
