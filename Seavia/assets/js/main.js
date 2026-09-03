@@ -322,7 +322,29 @@
     const oldTeamWrapper = teamDirectory.closest('.contact-team');
     teamContent.appendChild(teamDirectory);
     oldTeamWrapper.remove();
-    select('.team-card', true).forEach((card, index) => {
+    const teamGrid = teamDirectory.querySelector('.team-grid');
+    const teamCards = [...teamGrid.querySelectorAll('.team-card')];
+    const teamLayout = document.createElement('div');
+    teamLayout.className = 'team-flex-layout';
+    const teamTop = document.createElement('div');
+    teamTop.className = 'team-flex-top';
+    const teamLeads = document.createElement('div');
+    teamLeads.className = 'team-flex-leads';
+    const teamQuad = document.createElement('div');
+    teamQuad.className = 'team-flex-quad';
+    const teamBottom = document.createElement('div');
+    teamBottom.className = 'team-flex-bottom';
+
+    teamCards.forEach((card, index) => {
+      if (index < 2) teamLeads.appendChild(card);
+      else if (index < 6) teamQuad.appendChild(card);
+      else teamBottom.appendChild(card);
+    });
+    teamTop.append(teamLeads, teamQuad);
+    teamLayout.append(teamTop, teamBottom);
+    teamGrid.replaceWith(teamLayout);
+
+    teamCards.forEach((card, index) => {
       card.setAttribute('data-aos', 'zoom-in-up');
       card.setAttribute('data-aos-delay', String(100 + index * 70));
 
