@@ -321,6 +321,10 @@
     const oldTeamWrapper = teamDirectory.closest('.contact-team');
     teamContent.appendChild(teamDirectory);
     oldTeamWrapper.remove();
+    select('.team-card', true).forEach((card, index) => {
+      card.setAttribute('data-aos', 'zoom-in-up');
+      card.setAttribute('data-aos-delay', String(100 + index * 70));
+    });
   }
 
   const panels = select('.site-panel', true);
