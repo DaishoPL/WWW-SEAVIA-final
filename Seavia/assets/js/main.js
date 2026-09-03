@@ -233,6 +233,7 @@
     if (portfolioContainer) {
       const portfolioItems = select('.portfolio-item', true);
       const portfolioGroups = ['filter-spaces', 'filter-casinos', 'filter-cabins'];
+      const portfolioSwipers = [];
 
       portfolioGroups.forEach((group) => {
         const groupItems = portfolioItems.filter((item) => item.classList.contains(group));
@@ -241,36 +242,27 @@
         const pack = document.createElement('div');
         pack.className = `portfolio-pack ${group}`;
         pack.dataset.filter = `.${group}`;
-        const layout = document.createElement('div');
-        layout.className = 'portfolio-flex-layout';
-        const featureRow = document.createElement('div');
-        featureRow.className = 'portfolio-flex-row portfolio-flex-row-featured';
-        const featurePair = document.createElement('div');
-        featurePair.className = 'portfolio-flex-pair';
-        const smallCluster = document.createElement('div');
-        smallCluster.className = 'portfolio-flex-cluster';
-        const detailRow = document.createElement('div');
-        detailRow.className = 'portfolio-flex-row portfolio-flex-row-details';
-
-        groupItems.forEach((item, index) => {
-          item.classList.add('portfolio-flex-item');
-          if (index < 2) {
-            item.classList.add('portfolio-flex-feature');
-            featurePair.appendChild(item);
-          } else if (index < 6) {
-            item.classList.add('portfolio-flex-small');
-            smallCluster.appendChild(item);
-          } else {
-            item.classList.add('portfolio-flex-detail');
-            detailRow.appendChild(item);
-          }
+        const wrapper = document.createElement('div');
+        wrapper.className = 'swiper-wrapper';
+        groupItems.forEach((item) => {
+          item.classList.add('swiper-slide');
+          wrapper.appendChild(item);
         });
-
-        featureRow.append(featurePair, smallCluster);
-        layout.append(featureRow, detailRow);
-        pack.innerHTML = `<div class="portfolio-pack-heading"><span>${group.replace('filter-', '')}</span></div>`;
-        pack.appendChild(layout);
+        pack.innerHTML = `<div class="portfolio-pack-heading"><span>${group.replace('filter-', '')}</span><div class="portfolio-pack-controls"><button class="portfolio-prev" aria-label="Previous image"><i class="bx bx-left-arrow-alt"></i></button><button class="portfolio-next" aria-label="Next image"><i class="bx bx-right-arrow-alt"></i></button></div></div>`;
+        const swiper = document.createElement('div');
+        swiper.className = 'portfolio-swiper swiper';
+        swiper.appendChild(wrapper);
+        pack.appendChild(swiper);
         portfolioContainer.appendChild(pack);
+        portfolioSwipers.push(new Swiper(swiper, {
+          loop: groupItems.length > 2,
+          speed: 750,
+          spaceBetween: 18,
+          slidesPerView: 1.15,
+          autoplay: { delay: 3200, disableOnInteraction: false, pauseOnMouseEnter: true },
+          navigation: { nextEl: pack.querySelector('.portfolio-next'), prevEl: pack.querySelector('.portfolio-prev') },
+          breakpoints: { 640: { slidesPerView: 2.15 }, 992: { slidesPerView: 3.15 } }
+        }));
       });
 
       select('.portfolio-lightbox', true).forEach((lightboxLink) => {
@@ -297,14 +289,21 @@
         e.preventDefault();
         portfolioFilters.forEach((filter) => filter.classList.remove('filter-active'));
         this.classList.add('filter-active');
+        portfolioSwipers.forEach((swiper) => swiper.autoplay.stop());
         select('.portfolio-pack', true).forEach((pack) => {
           pack.hidden = pack.dataset.filter !== this.getAttribute('data-filter');
         });
+        const activePack = select(`.portfolio-pack[data-filter="${this.getAttribute('data-filter')}"]`);
+        if (activePack) {
+          const activeSwiper = portfolioSwipers.find((swiper) => swiper.el.closest('.portfolio-pack') === activePack);
+          if (activeSwiper) activeSwiper.autoplay.start();
+        }
       }, true);
 
       select('.portfolio-pack', true).forEach((pack, index) => {
         pack.hidden = index !== 0;
       });
+      if (portfolioSwipers[0]) portfolioSwipers[0].autoplay.start();
     }
 
   });
@@ -324,25 +323,6 @@
     oldTeamWrapper.remove();
     const teamGrid = teamDirectory.querySelector('.team-grid');
     const teamCards = [...teamGrid.querySelectorAll('.team-card')];
-    const teamLayout = document.createElement('div');
-    teamLayout.className = 'team-flex-layout';
-    const teamTop = document.createElement('div');
-    teamTop.className = 'team-flex-top';
-    const teamLeads = document.createElement('div');
-    teamLeads.className = 'team-flex-leads';
-    const teamQuad = document.createElement('div');
-    teamQuad.className = 'team-flex-quad';
-    const teamBottom = document.createElement('div');
-    teamBottom.className = 'team-flex-bottom';
-
-    teamCards.forEach((card, index) => {
-      if (index < 2) teamLeads.appendChild(card);
-      else if (index < 6) teamQuad.appendChild(card);
-      else teamBottom.appendChild(card);
-    });
-    teamTop.append(teamLeads, teamQuad);
-    teamLayout.append(teamTop, teamBottom);
-    teamGrid.replaceWith(teamLayout);
 
     teamCards.forEach((card, index) => {
       card.setAttribute('data-aos', 'zoom-in-up');
