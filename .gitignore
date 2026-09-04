@@ -18,3 +18,8 @@ Desktop.ini
 # (Opcjonalnie, gdyby contact.php generował lokalnie pliki z błędami)
 error_log
 php_errors.log
+
+# Klucze i lokalne dane konfiguracyjne
+Klucze strony.rtf
+.env
+.env.*
