@@ -481,11 +481,14 @@
         return;
       }
 
-      const turnstileResponse = formData.get('cf-turnstile-response');
+      const turnstileResponse = formData.get('cf-turnstile-response') || window.recruitmentTurnstileToken;
       if (!turnstileResponse) {
         if (successMessage) successMessage.textContent = 'Please complete the security check.';
         successMessage.style.color = '#b42318';
         return;
+      }
+      if (!formData.get('cf-turnstile-response')) {
+        formData.append('cf-turnstile-response', turnstileResponse);
       }
 
       const submitButton = recruitmentForm.querySelector('button[type="submit"]');
@@ -503,6 +506,7 @@
           }
           if (result.success) {
             recruitmentForm.reset();
+            window.recruitmentTurnstileToken = '';
             if (window.turnstile) window.turnstile.reset();
           }
         })

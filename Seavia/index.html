@@ -42,6 +42,15 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css?v=20260831-team-gallery" rel="stylesheet">
 
+  <script>
+    window.recruitmentTurnstileToken = '';
+    window.recruitmentTurnstileCallback = (token) => {
+      window.recruitmentTurnstileToken = token || '';
+    };
+    window.recruitmentTurnstileExpired = () => {
+      window.recruitmentTurnstileToken = '';
+    };
+  </script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 </head>
@@ -866,7 +875,7 @@
               </div>
 
               <div class="field full">
-                <div class="cf-turnstile" data-sitekey="YOUR_CLOUDFLARE_SITE_KEY">
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAAEmPViKJSX8qyWjH" data-callback="recruitmentTurnstileCallback" data-expired-callback="recruitmentTurnstileExpired" data-error-callback="recruitmentTurnstileExpired">
                 </div>
               </div>
 
@@ -1014,7 +1023,7 @@
   <script src="assets/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="assets/js/main.js?v=20260831-team-gallery"></script>
+  <script src="assets/js/main.js?v=20260904-turnstile"></script>
 
 </body>
 
