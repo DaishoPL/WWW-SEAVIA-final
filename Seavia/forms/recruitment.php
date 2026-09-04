@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(405, 'Invalid request method.');
 }
 
-$turnstileSecret = getenv('TURNSTILE_SECRET_KEY') ?: '';
+$turnstileSecret = getenv('TURNSTILE_SECRET_KEY') ?: ($_SERVER['TURNSTILE_SECRET_KEY'] ?? '');
 $turnstileToken = trim((string) ($_POST['cf-turnstile-response'] ?? ''));
 
 if ($turnstileSecret === '' || $turnstileToken === '') {
