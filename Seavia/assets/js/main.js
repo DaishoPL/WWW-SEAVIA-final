@@ -481,12 +481,17 @@
         return;
       }
 
-      const turnstileResponse = formData.get('cf-turnstile-response') || window.recruitmentTurnstileToken;
+      const turnstileResponse =
+        window.recruitmentTurnstileToken ||
+        (window.turnstile ? window.turnstile.getResponse() : '') ||
+        formData.get('cf-turnstile-response');
+
       if (!turnstileResponse) {
         if (successMessage) successMessage.textContent = 'Please complete the security check.';
         successMessage.style.color = '#b42318';
         return;
       }
+
       if (!formData.get('cf-turnstile-response')) {
         formData.append('cf-turnstile-response', turnstileResponse);
       }
