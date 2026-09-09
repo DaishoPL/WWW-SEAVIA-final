@@ -10,38 +10,65 @@ function respond(int $status, string $message)
     exit;
 }
 
+function getClientIp(): string
+{
+    $forwarded = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
+    if (is_string($forwarded) && $forwarded !== '') {
+        $candidate = explode(',', $forwarded)[0];
+        $candidate = trim($candidate);
+        if ($candidate !== '') {
+            return $candidate;
+        }
+    }
+
+    return (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+}
+
+function enforceRateLimit(string $ip): void
+{
+    $limitWindow = 600;
+    $maxRequests = 5;
+    $cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'seavia_recruitment';
+
+    if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0770, true) && !is_dir($cacheDir)) {
+        return;
+    }
+
+    $safeIp = preg_replace('/[^A-Za-z0-9._:-]/', '_', $ip) ?: 'unknown';
+    $cacheFile = $cacheDir . DIRECTORY_SEPARATOR . $safeIp . '.json';
+    $now = time();
+    $entries = [];
+
+    if (is_file($cacheFile)) {
+        $raw = @file_get_contents($cacheFile);
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded) && isset($decoded['requests']) && is_array($decoded['requests'])) {
+                $entries = $decoded['requests'];
+            }
+        }
+    }
+
+    $entries = array_values(array_filter(array_map('intval', $entries), static fn (int $timestamp): bool => $timestamp > $now - $limitWindow));
+
+    if (count($entries) >= $maxRequests) {
+        respond(429, 'Too many requests. Please try again later.');
+    }
+
+    $entries[] = $now;
+    @file_put_contents($cacheFile, json_encode(['requests' => $entries], JSON_UNESCAPED_UNICODE));
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(405, 'Invalid request method.');
 }
 
-$turnstileSecret = getenv('TURNSTILE_SECRET_KEY')
-    ?: ($_SERVER['TURNSTILE_SECRET_KEY'] ?? '')
-    ?: ($_SERVER['REDIRECT_TURNSTILE_SECRET_KEY'] ?? '');
-$turnstileToken = trim((string) ($_POST['cf-turnstile-response'] ?? ''));
-
-if ($turnstileSecret === '' || $turnstileToken === '') {
-    respond(400, 'Please complete the security check.');
+$honeypot = trim((string) ($_POST['website'] ?? ''));
+if ($honeypot !== '') {
+    respond(400, 'Invalid request.');
 }
 
-$verificationContext = stream_context_create([
-    'http' => [
-        'method' => 'POST',
-        'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
-        'content' => http_build_query([
-            'secret' => $turnstileSecret,
-            'response' => $turnstileToken,
-            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
-        ]),
-        'timeout' => 10,
-        'ignore_errors' => true,
-    ],
-]);
-$verification = @file_get_contents('https://challenges.cloudflare.com/turnstile/v0/siteverify', false, $verificationContext);
-$verificationResult = is_string($verification) ? json_decode($verification, true) : null;
-
-if (!is_array($verificationResult) || empty($verificationResult['success'])) {
-    respond(403, 'The security check could not be verified.');
-}
+enforceRateLimit(getClientIp());
 
 $firstName = trim((string) ($_POST['firstName'] ?? ''));
 $lastName = trim((string) ($_POST['lastName'] ?? ''));

@@ -455,6 +455,7 @@
       const about = (formData.get('about') || '').toString().trim();
       const cvFile = formData.get('cvFile');
       const notRobot = formData.get('notRobot');
+      const honeypot = (formData.get('website') || '').toString().trim();
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       if (!firstName || !lastName || !phone || !email || !about) {
@@ -481,19 +482,30 @@
         return;
       }
 
-      const turnstileResponse =
-        window.recruitmentTurnstileToken ||
-        (window.turnstile ? window.turnstile.getResponse() : '') ||
-        formData.get('cf-turnstile-response');
-
-      if (!turnstileResponse) {
-        if (successMessage) successMessage.textContent = 'Please complete the security check.';
+      if (honeypot !== '') {
+        if (successMessage) successMessage.textContent = 'Invalid request.';
         successMessage.style.color = '#b42318';
         return;
       }
 
-      if (!formData.get('cf-turnstile-response')) {
-        formData.append('cf-turnstile-response', turnstileResponse);
+      try {
+        const limitKey = 'seaviaRecruitmentAttempts';
+        const now = Date.now();
+        const windowMs = 10 * 60 * 1000;
+        const maxAttempts = 5;
+        const stored = JSON.parse(localStorage.getItem(limitKey) || '[]');
+        const recent = (Array.isArray(stored) ? stored : []).filter((value) => now - Number(value) < windowMs);
+
+        if (recent.length >= maxAttempts) {
+          if (successMessage) successMessage.textContent = 'Too many requests. Please try again later.';
+          successMessage.style.color = '#b42318';
+          return;
+        }
+
+        recent.push(now);
+        localStorage.setItem(limitKey, JSON.stringify(recent));
+      } catch (error) {
+        // Ignore storage issues; the server-side rate limit still protects the form.
       }
 
       const submitButton = recruitmentForm.querySelector('button[type="submit"]');

@@ -42,16 +42,6 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css?v=20260831-team-gallery" rel="stylesheet">
 
-  <script>
-    window.recruitmentTurnstileToken = '';
-    window.recruitmentTurnstileCallback = (token) => {
-      window.recruitmentTurnstileToken = token || '';
-    };
-    window.recruitmentTurnstileExpired = () => {
-      window.recruitmentTurnstileToken = '';
-    };
-  </script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 </head>
 
@@ -874,9 +864,9 @@
                 <input id="cvFile" name="cvFile" type="file" accept=".pdf,.doc,.docx" required>
               </div>
 
-              <div class="field full">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAAEmPViKJSX8qyWjH" data-callback="recruitmentTurnstileCallback" data-expired-callback="recruitmentTurnstileExpired" data-error-callback="recruitmentTurnstileExpired">
-                </div>
+              <div class="field full honeypot-field" style="display:none !important;" aria-hidden="true">
+                <label for="website">Website</label>
+                <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
               </div>
 
               <div class="field full checkbox-row">

@@ -2,6 +2,5 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301] 
 
-# Cloudflare Turnstile secret key used by forms/recruitment.php.
-# Replace the placeholder with the secret key in the production copy.
-SetEnv TURNSTILE_SECRET_KEY "WPROWADZ_TUTAJ_TURNSTILE_SECRET_KEY"
+# Rate limiting / honeypot form protection is handled in PHP.
+# Turnstile secret is intentionally not used here to keep the form working on shared hosting.
