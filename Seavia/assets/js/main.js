@@ -443,6 +443,21 @@
   const recruitmentForm = select('#recruitmentForm');
   if (recruitmentForm) {
     const successMessage = select('#recruitmentSuccess');
+    const captchaQuestion = select('#captchaQuestion');
+    const captchaFirst = select('#captchaFirst');
+    const captchaSecond = select('#captchaSecond');
+    const captchaAnswer = select('#captchaAnswer');
+
+    const createCaptcha = () => {
+      const first = Math.floor(Math.random() * 8) + 2;
+      const second = Math.floor(Math.random() * 8) + 2;
+      if (captchaQuestion) captchaQuestion.textContent = `What is ${first} + ${second}?`;
+      if (captchaFirst) captchaFirst.value = first;
+      if (captchaSecond) captchaSecond.value = second;
+      if (captchaAnswer) captchaAnswer.value = '';
+    };
+
+    createCaptcha();
 
     recruitmentForm.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -456,6 +471,9 @@
       const cvFile = formData.get('cvFile');
       const notRobot = formData.get('notRobot');
       const honeypot = (formData.get('website') || '').toString().trim();
+      const captchaFirstValue = Number(formData.get('captchaFirst'));
+      const captchaSecondValue = Number(formData.get('captchaSecond'));
+      const captchaAnswerValue = Number(formData.get('captchaAnswer'));
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       if (!firstName || !lastName || !phone || !email || !about) {
@@ -485,6 +503,13 @@
       if (honeypot !== '') {
         if (successMessage) successMessage.textContent = 'Invalid request.';
         successMessage.style.color = '#b42318';
+        return;
+      }
+
+      if (!Number.isInteger(captchaAnswerValue) || captchaAnswerValue !== captchaFirstValue + captchaSecondValue) {
+        if (successMessage) successMessage.textContent = 'Please solve the security check correctly.';
+        successMessage.style.color = '#b42318';
+        createCaptcha();
         return;
       }
 
@@ -523,8 +548,7 @@
           }
           if (result.success) {
             recruitmentForm.reset();
-            window.recruitmentTurnstileToken = '';
-            if (window.turnstile) window.turnstile.reset();
+            createCaptcha();
           }
         })
         .catch(() => {

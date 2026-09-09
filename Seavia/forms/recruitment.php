@@ -68,6 +68,16 @@ if ($honeypot !== '') {
     respond(400, 'Invalid request.');
 }
 
+$captchaFirst = filter_var($_POST['captchaFirst'] ?? null, FILTER_VALIDATE_INT);
+$captchaSecond = filter_var($_POST['captchaSecond'] ?? null, FILTER_VALIDATE_INT);
+$captchaAnswer = filter_var($_POST['captchaAnswer'] ?? null, FILTER_VALIDATE_INT);
+if ($captchaFirst === false || $captchaSecond === false || $captchaAnswer === false
+    || $captchaFirst < 2 || $captchaFirst > 9
+    || $captchaSecond < 2 || $captchaSecond > 9
+    || $captchaAnswer !== $captchaFirst + $captchaSecond) {
+    respond(422, 'Please solve the security check correctly.');
+}
+
 enforceRateLimit(getClientIp());
 
 $firstName = trim((string) ($_POST['firstName'] ?? ''));

@@ -869,6 +869,13 @@
                 <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
               </div>
 
+              <div class="field full captcha-field">
+                <label for="captchaAnswer">Security check: <span id="captchaQuestion">What is 3 + 4?</span></label>
+                <input id="captchaAnswer" name="captchaAnswer" type="number" inputmode="numeric" min="0" max="100" placeholder="Your answer" required>
+                <input id="captchaFirst" name="captchaFirst" type="hidden" value="3">
+                <input id="captchaSecond" name="captchaSecond" type="hidden" value="4">
+              </div>
+
               <div class="field full checkbox-row">
                 <label class="checkbox-label" for="notRobot">
                   <input id="notRobot" name="notRobot" type="checkbox" required>
