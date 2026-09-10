@@ -2303,12 +2303,6 @@ section {
   accent-color: var(--seavia-coral);
 }
 
-.cf-turnstile {
-  display: flex;
-  justify-content: flex-start;
-  min-height: 65px;
-}
-
 .form-actions {
   display: flex;
   flex-direction: column;

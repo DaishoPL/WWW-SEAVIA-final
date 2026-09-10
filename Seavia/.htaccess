@@ -3,4 +3,3 @@ RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301] 
 
 # Rate limiting / honeypot form protection is handled in PHP.
-# Turnstile secret is intentionally not used here to keep the form working on shared hosting.
