@@ -116,7 +116,7 @@ if (!in_array($detectedMime, $allowedMimes[$extension], true)) {
     respond(422, 'The uploaded CV file type is not valid.');
 }
 
-$recipient = 'rekrutacja@seaviamarine.com';
+$recipient = 'abogdanski@seaviamarine.com';
 $subject = 'Nowa aplikacja rekrutacyjna - SEAVIA';
 $boundary = bin2hex(random_bytes(16));
 $senderName = preg_replace('/[\r\n]+/', ' ', "$firstName $lastName");
