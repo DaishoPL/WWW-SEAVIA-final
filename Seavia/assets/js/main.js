@@ -488,6 +488,12 @@
         return;
       }
 
+      if (!cvFile || !cvFile.name) {
+        if (successMessage) successMessage.textContent = 'Please attach your CV.';
+        successMessage.style.color = '#b42318';
+        return;
+      }
+
       if (!notRobot) {
         if (successMessage) successMessage.textContent = 'Please confirm that the information is correct.';
         successMessage.style.color = '#b42318';
