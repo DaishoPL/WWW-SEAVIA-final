@@ -9,5 +9,5 @@ compatibility_date = "2026-09-10"
 FROM_EMAIL = "SEAVIA <rekrutacja@seaviamarine.com>"
 
 [[routes]]
-pattern = "api.seaviamarine.com/recruitment"
+pattern = "api.seaviamarine.com"
 custom_domain = true

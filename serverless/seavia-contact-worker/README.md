@@ -27,7 +27,7 @@ Ten Worker zastępuje endpoint PHP z funkcją `mail()` i wysyła zgłoszenia rek
    npx wrangler deploy
    ```
 
-5. W panelu DNS Cloudflare utwórz `api.seaviamarine.com` i upewnij się, że subdomena jest przekierowana do Workera. Formularz wysyła dane pod adres:
+5. W panelu Cloudflare przypnij custom domain `api.seaviamarine.com` do Workera. Dla custom domain nie dodawaj ścieżki `/recruitment` w konfiguracji DNS ani trasy. Formularz wysyła dane pod adres:
 
    ```text
    https://api.seaviamarine.com/recruitment
