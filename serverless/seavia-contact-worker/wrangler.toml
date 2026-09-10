@@ -1,0 +1,13 @@
+name = "seavia-contact"
+main = "src/index.js"
+compatibility_date = "2026-09-10"
+
+# Add a DNS record for api.seaviamarine.com and attach this Worker to it
+# after the first deployment. Keep the API key in Worker secrets, not here.
+
+[vars]
+FROM_EMAIL = "SEAVIA <rekrutacja@seaviamarine.com>"
+
+[[routes]]
+pattern = "api.seaviamarine.com/recruitment"
+custom_domain = true

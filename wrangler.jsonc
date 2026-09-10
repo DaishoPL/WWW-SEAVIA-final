@@ -1,0 +1,5 @@
+{
+  "name": "worker-seavia",
+  "compatibility_date": "2026-09-10",
+  "main": "serverless/seavia-contact-worker/src/index.js"
+}
