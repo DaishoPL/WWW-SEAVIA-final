@@ -97,7 +97,7 @@ if ($cvUploadError !== UPLOAD_ERR_NO_FILE && $cvUploadError !== UPLOAD_ERR_OK) {
 
 $cvAvailable = $cvUploadError === UPLOAD_ERR_OK;
 
-$recipient = 'abogdanski@seaviamarine.com';
+$recipient = 'tylotyznaszadres@gmail.com';
 $subject = 'Nowa aplikacja rekrutacyjna - SEAVIA';
 $senderName = preg_replace('/[\r\n]+/', ' ', "$firstName $lastName");
 $body = "First name: {$firstName}\nLast name: {$lastName}\nPhone: {$phone}\nEmail: {$email}\n\nAbout the applicant:\n{$about}\n";
