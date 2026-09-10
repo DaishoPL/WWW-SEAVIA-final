@@ -27,7 +27,7 @@ function getClientIp(): string
 function enforceRateLimit(string $ip): void
 {
     $limitWindow = 600;
-    $maxRequests = 5;
+    $maxRequests = 10;
     $cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'seavia_recruitment';
 
     if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0770, true) && !is_dir($cacheDir)) {

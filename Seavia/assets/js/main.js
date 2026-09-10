@@ -508,10 +508,10 @@
       }
 
       try {
-        const limitKey = 'seaviaRecruitmentAttempts';
+        const limitKey = 'seaviaRecruitmentAttemptsV2';
         const now = Date.now();
         const windowMs = 10 * 60 * 1000;
-        const maxAttempts = 5;
+        const maxAttempts = 10;
         const stored = JSON.parse(localStorage.getItem(limitKey) || '[]');
         const recent = (Array.isArray(stored) ? stored : []).filter((value) => now - Number(value) < windowMs);
 

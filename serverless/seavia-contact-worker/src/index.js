@@ -38,7 +38,7 @@ function isRateLimited(ip) {
   const windowMs = 10 * 60 * 1000;
   const recent = (rateLimit.get(ip) || []).filter((timestamp) => now - timestamp < windowMs);
 
-  if (recent.length >= 5) {
+  if (recent.length >= 10) {
     rateLimit.set(ip, recent);
     return true;
   }
@@ -98,10 +98,6 @@ export default {
       return respond(500, 'The application could not be sent. Please try again later.', origin);
     }
 
-    if (isRateLimited(getClientIp(request))) {
-      return respond(429, 'Too many requests. Please try again later.', origin);
-    }
-
     const formData = await request.formData();
     if (clean(formData.get('website')) !== '') {
       return respond(400, 'Invalid request.', origin);
@@ -129,6 +125,10 @@ export default {
 
     if (!firstName || !lastName || !phone || !about || !emailPattern.test(email)) {
       return respond(422, 'Please complete all required fields with valid information.', origin);
+    }
+
+    if (isRateLimited(getClientIp(request))) {
+      return respond(429, 'Too many requests. Please try again later.', origin);
     }
 
     const attachments = [];
