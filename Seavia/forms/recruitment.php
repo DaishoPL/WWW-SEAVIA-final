@@ -90,50 +90,65 @@ if ($firstName === '' || $lastName === '' || $phone === '' || $about === '' || !
     respond(422, 'Please complete all required fields with valid information.');
 }
 
-if (!isset($_FILES['cvFile']) || $_FILES['cvFile']['error'] !== UPLOAD_ERR_OK) {
-    respond(422, 'Please attach your CV.');
+$cvUploadError = (int) ($_FILES['cvFile']['error'] ?? UPLOAD_ERR_NO_FILE);
+if ($cvUploadError !== UPLOAD_ERR_NO_FILE && $cvUploadError !== UPLOAD_ERR_OK) {
+    respond(422, 'The CV could not be uploaded. Please try again.');
 }
 
-$cv = $_FILES['cvFile'];
-if ($cv['size'] > 5 * 1024 * 1024) {
-    respond(422, 'The CV file must be smaller than 5 MB.');
-}
-
-$extension = strtolower(pathinfo((string) $cv['name'], PATHINFO_EXTENSION));
-$allowedExtensions = ['pdf', 'doc', 'docx'];
-if (!in_array($extension, $allowedExtensions, true)) {
-    respond(422, 'The CV must be a PDF, DOC, or DOCX file.');
-}
-
-$uploadPath = (string) $cv['tmp_name'];
-$detectedMime = (new finfo(FILEINFO_MIME_TYPE))->file($uploadPath);
-$allowedMimes = [
-    'pdf' => ['application/pdf'],
-    'doc' => ['application/msword', 'application/octet-stream'],
-    'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
-];
-if (!in_array($detectedMime, $allowedMimes[$extension], true)) {
-    respond(422, 'The uploaded CV file type is not valid.');
-}
+$cvAvailable = $cvUploadError === UPLOAD_ERR_OK;
 
 $recipient = 'abogdanski@seaviamarine.com';
 $subject = 'Nowa aplikacja rekrutacyjna - SEAVIA';
-$boundary = bin2hex(random_bytes(16));
 $senderName = preg_replace('/[\r\n]+/', ' ', "$firstName $lastName");
-$filename = preg_replace('/[^A-Za-z0-9._-]/', '_', basename((string) $cv['name']));
 $body = "First name: {$firstName}\nLast name: {$lastName}\nPhone: {$phone}\nEmail: {$email}\n\nAbout the applicant:\n{$about}\n";
-$encodedFile = chunk_split(base64_encode((string) file_get_contents($uploadPath)));
 
 $headers = "From: SEAVIA website <no-reply@seaviamarine.com>\r\n";
 $headers .= "Reply-To: {$email}\r\n";
-$headers .= "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n";
-$message = "--{$boundary}\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n{$body}\r\n";
-$message .= "--{$boundary}\r\nContent-Type: {$detectedMime}; name=\"{$filename}\"\r\nContent-Disposition: attachment; filename=\"{$filename}\"\r\nContent-Transfer-Encoding: base64\r\n\r\n{$encodedFile}\r\n--{$boundary}--\r\n";
+
+if ($cvAvailable) {
+    $cv = $_FILES['cvFile'];
+    if ($cv['size'] > 5 * 1024 * 1024) {
+        respond(422, 'The CV file must be smaller than 5 MB.');
+    }
+
+    $extension = strtolower(pathinfo((string) $cv['name'], PATHINFO_EXTENSION));
+    $allowedExtensions = ['pdf', 'doc', 'docx'];
+    if (!in_array($extension, $allowedExtensions, true)) {
+        respond(422, 'The CV must be a PDF, DOC, or DOCX file.');
+    }
+
+    $uploadPath = (string) $cv['tmp_name'];
+    $detectedMime = (new finfo(FILEINFO_MIME_TYPE))->file($uploadPath);
+    $allowedMimes = [
+        'pdf' => ['application/pdf'],
+        'doc' => ['application/msword', 'application/octet-stream'],
+        'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
+    ];
+    if (!in_array($detectedMime, $allowedMimes[$extension], true)) {
+        respond(422, 'The uploaded CV file type is not valid.');
+    }
+
+    $boundary = bin2hex(random_bytes(16));
+    $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', basename((string) $cv['name']));
+    $encodedFile = chunk_split(base64_encode((string) file_get_contents($uploadPath)));
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n";
+    $message = "--{$boundary}\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n{$body}\r\n";
+    $message .= "--{$boundary}\r\nContent-Type: {$detectedMime}; name=\"{$filename}\"\r\nContent-Disposition: attachment; filename=\"{$filename}\"\r\nContent-Transfer-Encoding: base64\r\n\r\n{$encodedFile}\r\n--{$boundary}--\r\n";
+} else {
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $message = $body;
+}
 
 if (!mail($recipient, $subject, $message, $headers)) {
     respond(500, 'The application could not be sent. Please try again later.');
 }
+
+$confirmationSubject = 'Potwierdzenie otrzymania zgłoszenia - SEAVIA';
+$confirmationBody = "Dzień dobry {$firstName},\n\nPotwierdzamy otrzymanie zgłoszenia rekrutacyjnego w SEAVIA.\nSkontaktujemy się z Tobą, jeśli będziemy potrzebować dodatkowych informacji.\n\nPozdrawiamy,\nSEAVIA\n";
+$confirmationHeaders = "From: SEAVIA <no-reply@seaviamarine.com>\r\n";
+$confirmationHeaders .= "Content-Type: text/plain; charset=UTF-8\r\n";
+mail($email, $confirmationSubject, $confirmationBody, $confirmationHeaders);
 
 http_response_code(200);
 echo json_encode(['success' => true, 'message' => 'Your application has been sent.'], JSON_UNESCAPED_UNICODE);
